@@ -4,6 +4,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/add_task_fab.dart';
 import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../calendar/view/calendar_screen.dart';
+import '../../focus/view/focus_screen.dart';
 import '../../home/view/home_screen.dart';
 import '../../onboarding/view/welcome_screen.dart';
 import 'widgets/change_image_sheet.dart';
@@ -170,6 +171,11 @@ class ProfileScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const CalendarScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const FocusScreen()),
             );
           }
         },

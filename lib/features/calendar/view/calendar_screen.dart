@@ -3,6 +3,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/add_task_fab.dart';
 import '../../../core/widgets/bottom_nav_bar.dart';
+import '../../focus/view/focus_screen.dart';
 import '../../home/view/home_screen.dart';
 import '../../profile/view/profile_screen.dart';
 import '../../task/model/task_dummy_data.dart';
@@ -83,6 +84,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const FocusScreen()),
             );
           } else if (index == 3) {
             Navigator.pushReplacement(
