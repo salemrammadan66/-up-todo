@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:up_todo/features/task/viewmodel/task_cubit.dart';
 import 'core/constants/app_colors.dart';
 import 'features/onboarding/view/splash_screen.dart';
 
@@ -11,13 +13,16 @@ class UpTodoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.background,
-        useMaterial3: true,
+    return BlocProvider(
+      create: (context) => TaskCubit()..loadTasks(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: AppColors.background,
+          useMaterial3: true,
+        ),
+        home: const SplashScreen(),
       ),
-      home: const SplashScreen(),
     );
   }
 }

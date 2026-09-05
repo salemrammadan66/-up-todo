@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/add_task_fab.dart';
@@ -6,7 +7,8 @@ import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../calendar/view/calendar_screen.dart';
 import '../../focus/view/focus_screen.dart';
 import '../../profile/view/profile_screen.dart';
-import '../../task/model/task_dummy_data.dart';
+import '../../task/viewmodel/task_cubit.dart';
+import '../../task/viewmodel/task_state.dart';
 import '../../task/view/task_detail_screen.dart';
 import 'widgets/completed_section_header.dart';
 import 'widgets/dropdown_filter.dart';
@@ -55,17 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: TaskDummyData.tasks.isEmpty
-                  ? Center(
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  // Show a loading/empty state until data is ready
+                  if (state is! TaskLoaded) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final tasks = state.tasks;
+                  final completedTasks = state.completedTasks;
+
+                  if (tasks.isEmpty && completedTasks.isEmpty) {
+                    return Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              'assets/images/empty_home.png',
-                              height: 200,
-                            ),
+                            Icon(Icons.today, size: 200),
                             const SizedBox(height: 24),
                             Text(
                               'What do you want to do today?',
@@ -81,56 +90,58 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                       ),
-                    )
-                  : ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: [
-                        const TaskSearchBar(),
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: DropdownFilter(
-                            selected: _selectedFilter,
-                            onChanged: (value) =>
-                                setState(() => _selectedFilter = value!),
+                    );
+                  }
+
+                  return ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      const TaskSearchBar(),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: DropdownFilter(
+                          selected: _selectedFilter,
+                          onChanged: (value) =>
+                              setState(() => _selectedFilter = value!),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      for (final task in tasks)
+                        TaskCard(
+                          task: task,
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TaskDetailScreen(task: task),
+                            ),
                           ),
                         ),
+                      if (completedTasks.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        for (final task in TaskDummyData.tasks)
-                          TaskCard(
-                            task: task,
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => TaskDetailScreen(task: task),
-                              ),
-                            ),
+                        CompletedSectionHeader(
+                          count: completedTasks.length,
+                          isExpanded: _isCompletedExpanded,
+                          onTap: () => setState(
+                            () => _isCompletedExpanded = !_isCompletedExpanded,
                           ),
-                        if (TaskDummyData.completedTasks.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          CompletedSectionHeader(
-                            count: TaskDummyData.completedTasks.length,
-                            isExpanded: _isCompletedExpanded,
-                            onTap: () => setState(
-                              () =>
-                                  _isCompletedExpanded = !_isCompletedExpanded,
-                            ),
-                          ),
-                          if (_isCompletedExpanded)
-                            for (final task in TaskDummyData.completedTasks)
-                              TaskCard(
-                                task: task,
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        TaskDetailScreen(task: task),
-                                  ),
+                        ),
+                        if (_isCompletedExpanded)
+                          for (final task in completedTasks)
+                            TaskCard(
+                              task: task,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TaskDetailScreen(task: task),
                                 ),
                               ),
-                        ],
+                            ),
                       ],
-                    ),
+                    ],
+                  );
+                },
+              ),
             ),
           ],
         ),
