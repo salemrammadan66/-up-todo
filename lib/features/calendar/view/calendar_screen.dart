@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/add_task_fab.dart';
@@ -6,7 +7,8 @@ import '../../../core/widgets/bottom_nav_bar.dart';
 import '../../focus/view/focus_screen.dart';
 import '../../home/view/home_screen.dart';
 import '../../profile/view/profile_screen.dart';
-import '../../task/model/task_dummy_data.dart';
+import '../../task/viewmodel/task_cubit.dart';
+import '../../task/viewmodel/task_state.dart';
 import '../../task/view/task_detail_screen.dart';
 import '../../task/view/widgets/task_card.dart';
 import 'widgets/calendar_tab_selector.dart';
@@ -25,10 +27,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tasks = _isTodaySelected
-        ? TaskDummyData.tasks
-        : TaskDummyData.completedTasks;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -55,20 +53,34 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  for (final task in tasks)
-                    TaskCard(
-                      task: task,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TaskDetailScreen(task: task),
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  if (state is! TaskLoaded) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final tasks = _isTodaySelected
+                      ? state.tasks
+                      : state.completedTasks;
+
+                  return ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      for (final task in tasks)
+                        TaskCard(
+                          task: task,
+                          onToggleComplete: () =>
+                              context.read<TaskCubit>().toggleComplete(task.id),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TaskDetailScreen(task: task),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                ],
+                    ],
+                  );
+                },
               ),
             ),
           ],

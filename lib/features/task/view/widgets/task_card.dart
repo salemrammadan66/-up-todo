@@ -6,8 +6,14 @@ import '../../model/task_model.dart';
 class TaskCard extends StatelessWidget {
   final TaskModel task;
   final VoidCallback onTap;
+  final VoidCallback onToggleComplete;
 
-  const TaskCard({super.key, required this.task, required this.onTap});
+  const TaskCard({
+    super.key,
+    required this.task,
+    required this.onTap,
+    required this.onToggleComplete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +28,14 @@ class TaskCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              task.isCompleted ? Icons.check_circle : Icons.circle_outlined,
-              color: task.isCompleted ? AppColors.primary : AppColors.textMuted,
+            IconButton(
+              onPressed: onToggleComplete,
+              icon: Icon(
+                task.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                color: task.isCompleted
+                    ? AppColors.primary
+                    : AppColors.textMuted,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

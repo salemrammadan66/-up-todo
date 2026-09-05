@@ -116,6 +116,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (_) => TaskDetailScreen(task: task),
                             ),
                           ),
+                          onToggleComplete: () =>
+                              context.read<TaskCubit>().toggleComplete(task.id),
                         ),
                       if (completedTasks.isNotEmpty) ...[
                         const SizedBox(height: 8),
@@ -136,6 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (_) => TaskDetailScreen(task: task),
                                 ),
                               ),
+                              onToggleComplete: () => context
+                                  .read<TaskCubit>()
+                                  .toggleComplete(task.id),
                             ),
                       ],
                     ],
