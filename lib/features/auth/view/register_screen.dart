@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_text_field.dart';
+import '../../home/view/home_screen.dart';
+import '../viewmodel/auth_cubit.dart';
+import '../viewmodel/auth_state.dart';
 import 'login_screen.dart';
 import 'widgets/social_button.dart';
 
@@ -85,7 +89,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _confirmPasswordController,
               ),
               const SizedBox(height: 40),
-              CustomButton(text: 'Register', onPressed: _isFormValid ? () {} : null),
+              BlocConsumer<AuthCubit, AuthState>(
+                listener: (context, state) {
+                  if (state is AuthSuccess) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    );
+                  } else if (state is AuthFailure) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.message)));
+                  }
+                },
+                builder: (context, state) {
+                  final isLoading = state is AuthLoading;
+
+                  return CustomButton(
+                    text: isLoading ? 'Loading...' : 'Register',
+                    onPressed: _isFormValid && !isLoading
+                        ? () => context.read<AuthCubit>().register(
+                            _usernameController.text,
+                            _passwordController.text,
+                            _confirmPasswordController.text,
+                          )
+                        : null,
+                  );
+                },
+              ),
               const SizedBox(height: 18),
               Row(
                 children: [

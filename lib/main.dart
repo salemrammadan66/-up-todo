@@ -4,6 +4,7 @@ import 'package:up_todo/features/category/viewmodel/category_cubit.dart';
 import 'package:up_todo/features/profile/viewmodel/profile_cubit.dart';
 import 'package:up_todo/features/task/viewmodel/task_cubit.dart';
 import 'core/constants/app_colors.dart';
+import 'features/auth/viewmodel/auth_cubit.dart';
 import 'features/onboarding/view/splash_screen.dart';
 
 void main() {
@@ -17,6 +18,7 @@ class UpTodoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => TaskCubit()..loadTasks()),
         BlocProvider(create: (context) => CategoryCubit()..loadCategories()),
         BlocProvider(create: (context) => ProfileCubit()..loadProfile()),
