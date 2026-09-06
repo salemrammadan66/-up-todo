@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/add_task_fab.dart';
@@ -7,6 +8,8 @@ import '../../calendar/view/calendar_screen.dart';
 import '../../focus/view/focus_screen.dart';
 import '../../home/view/home_screen.dart';
 import '../../onboarding/view/welcome_screen.dart';
+import '../viewmodel/profile_cubit.dart';
+import '../viewmodel/profile_state.dart';
 import 'widgets/change_image_sheet.dart';
 import 'widgets/change_name_sheet.dart';
 import 'widgets/change_password_sheet.dart';
@@ -18,6 +21,8 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   void _onChangeNameTap(BuildContext context) async {
+    final currentName = context.read<ProfileCubit>().name;
+
     final result = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: AppColors.surface,
@@ -25,8 +30,12 @@ class ProfileScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => const ChangeNameSheet(currentName: 'Salem Ramadan'),
+      builder: (_) => ChangeNameSheet(currentName: currentName),
     );
+
+    if (result != null && result.isNotEmpty && context.mounted) {
+      context.read<ProfileCubit>().changeName(result);
+    }
   }
 
   void _onChangePasswordTap(BuildContext context) {
@@ -90,7 +99,12 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Center(
-                child: Text('Salem Ramadan', style: AppTextStyles.buttonText),
+                child: BlocBuilder<ProfileCubit, ProfileState>(
+                  builder: (context, state) {
+                    final name = state is ProfileLoaded ? state.name : '';
+                    return Text(name, style: AppTextStyles.buttonText);
+                  },
+                ),
               ),
               const SizedBox(height: 16),
               const Row(
