@@ -22,8 +22,48 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  int _selectedDay = 9;
+  static const _monthNames = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER',
+  ];
+
+  late DateTime _selectedDate;
+  late List<DateTime> _weekDates;
   bool _isTodaySelected = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final today = DateTime.now();
+    _selectedDate = DateTime(today.year, today.month, today.day);
+    _weekDates = _buildWeekDates(_selectedDate);
+  }
+
+  List<DateTime> _buildWeekDates(DateTime date) {
+    // Dart weekday: Monday = 1 ... Sunday = 7. We want the week to start on Sunday.
+    final daysFromSunday = date.weekday % 7;
+    final sunday = date.subtract(Duration(days: daysFromSunday));
+    return List.generate(7, (index) => sunday.add(Duration(days: index)));
+  }
+
+  void _onDaySelected(int day) {
+    final match = _weekDates.firstWhere((d) => d.day == day);
+    setState(() => _selectedDate = match);
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +78,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Text('Calendar', style: AppTextStyles.headlineBold),
             ),
             WeekCalendarStrip(
-              monthLabel: 'FEBRUARY',
-              days: const [6, 7, 8, 9, 10, 11, 12],
-              selectedDay: _selectedDay,
-              onDaySelected: (day) => setState(() => _selectedDay = day),
+              monthLabel: _monthNames[_selectedDate.month - 1],
+              days: _weekDates.map((d) => d.day).toList(),
+              selectedDay: _selectedDate.day,
+              onDaySelected: _onDaySelected,
             ),
             const SizedBox(height: 16),
             Padding(
@@ -59,9 +99,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final tasks = _isTodaySelected
+                  final sourceList = _isTodaySelected
                       ? state.tasks
                       : state.completedTasks;
+
+                  final tasks = sourceList
+                      .where(
+                        (task) =>
+                            task.dueDate != null &&
+                            _isSameDay(task.dueDate!, _selectedDate),
+                      )
+                      .toList();
+
+                  if (tasks.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No tasks for this day',
+                        style: AppTextStyles.bodySecondary,
+                      ),
+                    );
+                  }
 
                   return ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),

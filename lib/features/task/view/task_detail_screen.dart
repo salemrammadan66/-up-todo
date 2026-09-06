@@ -63,7 +63,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final minute = time.minute.toString().padLeft(2, '0');
     final timeText = '${date.day}/${date.month} At $hour:$minute';
 
-    context.read<TaskCubit>().changeTime(task.id, timeText);
+    final dueDate = DateTime(date.year, date.month, date.day);
+    context.read<TaskCubit>().changeTime(task.id, timeText, dueDate);
   }
 
   void _onCategoryTap(TaskModel task) async {

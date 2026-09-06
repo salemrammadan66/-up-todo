@@ -93,13 +93,20 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
       final hour = _selectedTime!.hour.toString().padLeft(2, '0');
       final minute = _selectedTime!.minute.toString().padLeft(2, '0');
       timeText =
-      '${_selectedDate!.day}/${_selectedDate!.month} At $hour:$minute';
+          '${_selectedDate!.day}/${_selectedDate!.month} At $hour:$minute';
     }
 
     final newTask = TaskModel(
       id: DateTime.now().millisecondsSinceEpoch,
       title: title,
       time: timeText,
+      dueDate: _selectedDate != null
+          ? DateTime(
+              _selectedDate!.year,
+              _selectedDate!.month,
+              _selectedDate!.day,
+            )
+          : DateTime.now(),
       description: _descriptionController.text.trim(),
       label: _selectedCategory?.name ?? 'General',
       labelColor: _selectedCategory?.color ?? AppColors.primary,
@@ -108,6 +115,35 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
 
     context.read<TaskCubit>().addTask(newTask);
     Navigator.pop(context);
+  }
+
+  Widget _buildChip({required IconData icon, String? label, Color? color}) {
+    final bool isSelected = label != null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isSelected ? (color ?? AppColors.primary) : AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: isSelected ? Colors.white : AppColors.textMuted,
+          ),
+          if (isSelected) ...[
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: AppTextStyles.mutedLabel.copyWith(color: Colors.white),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
   @override
@@ -147,26 +183,48 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
           ),
           const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                onPressed: _onDateTimeTap,
-                icon: const Icon(Icons.access_time, color: AppColors.textMuted),
-              ),
-              IconButton(
-                onPressed: _onCategoryTap,
-                icon: const Icon(
-                  Icons.local_offer_outlined,
-                  color: AppColors.textMuted,
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _onDateTimeTap,
+                        child: _buildChip(
+                          icon: Icons.access_time,
+                          label: _selectedDate != null && _selectedTime != null
+                              ? '${_selectedDate!.day}/${_selectedDate!.month} ${_selectedTime!.format(context)}'
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _onCategoryTap,
+                        child: _buildChip(
+                          icon:
+                              _selectedCategory?.icon ??
+                              Icons.local_offer_outlined,
+                          label: _selectedCategory?.name,
+                          color: _selectedCategory?.color,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: _onPriorityTap,
+                        child: _buildChip(
+                          icon: Icons.flag_outlined,
+                          label: _selectedPriority != null
+                              ? 'Priority $_selectedPriority'
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              IconButton(
-                onPressed: _onPriorityTap,
-                icon: const Icon(
-                  Icons.flag_outlined,
-                  color: AppColors.textMuted,
-                ),
-              ),
-              const Spacer(),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: _onSendTap,
                 icon: const Icon(Icons.send, color: AppColors.primary),

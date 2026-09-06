@@ -4,11 +4,14 @@ import 'task_model.dart';
 class TaskDummyData {
   TaskDummyData._();
 
-  static const List<TaskModel> tasks = [
+  static final DateTime _today = DateTime.now();
+
+  static final List<TaskModel> tasks = [
     TaskModel(
       id: 1,
       title: 'Do Math Homework',
       time: 'Today At 16:45',
+      dueDate: _today,
       description: 'Do chapter 2 to 5 for next week',
       label: 'University',
       labelColor: AppColors.universityColor,
@@ -18,6 +21,7 @@ class TaskDummyData {
       id: 2,
       title: 'Tack out dogs',
       time: 'Today At 19:20',
+      dueDate: _today,
       description: 'Walk the dogs around the block twice',
       label: 'Home',
       labelColor: AppColors.homeColor,
@@ -26,7 +30,8 @@ class TaskDummyData {
     TaskModel(
       id: 3,
       title: 'Business meeting with CEO',
-      time: 'Today At 08:15',
+      time: 'Tomorrow At 08:15',
+      dueDate: _today.add(const Duration(days: 1)),
       description: 'Discuss Q3 roadmap and budget',
       label: 'Work',
       labelColor: AppColors.workColor,
@@ -34,11 +39,12 @@ class TaskDummyData {
     ),
   ];
 
-  static const List<TaskModel> completedTasks = [
+  static final List<TaskModel> completedTasks = [
     TaskModel(
       id: 4,
       title: 'Buy Grocery',
       time: 'Today At 12:45',
+      dueDate: _today,
       description: 'Milk, eggs, bread, and vegetables',
       label: 'Home',
       labelColor: AppColors.homeColor,

@@ -8,6 +8,8 @@ import '../../calendar/view/calendar_screen.dart';
 import '../../focus/view/focus_screen.dart';
 import '../../home/view/home_screen.dart';
 import '../../onboarding/view/welcome_screen.dart';
+import '../../task/viewmodel/task_cubit.dart';
+import '../../task/viewmodel/task_state.dart';
 import '../viewmodel/profile_cubit.dart';
 import '../viewmodel/profile_state.dart';
 import 'widgets/change_image_sheet.dart';
@@ -107,12 +109,19 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Row(
-                children: [
-                  ProfileStatCard(label: '10 Task left'),
-                  SizedBox(width: 12),
-                  ProfileStatCard(label: '5 Task done'),
-                ],
+              BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  final tasksLeft = state is TaskLoaded ? state.tasks.length : 0;
+                  final tasksDone = state is TaskLoaded ? state.completedTasks.length : 0;
+
+                  return Row(
+                    children: [
+                      ProfileStatCard(label: '$tasksLeft Task left'),
+                      const SizedBox(width: 12),
+                      ProfileStatCard(label: '$tasksDone Task done'),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               Text('Settings', style: AppTextStyles.mutedLabel),

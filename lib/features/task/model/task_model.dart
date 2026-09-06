@@ -4,6 +4,7 @@ class TaskModel {
   final int id;
   final String title;
   final String time;
+  final DateTime? dueDate;
   final String description;
   final String label;
   final Color labelColor;
@@ -14,6 +15,7 @@ class TaskModel {
     required this.id,
     required this.title,
     required this.time,
+    this.dueDate,
     required this.description,
     required this.label,
     required this.labelColor,
@@ -24,6 +26,7 @@ class TaskModel {
   TaskModel copyWith({
     String? title,
     String? time,
+    DateTime? dueDate,
     String? description,
     String? label,
     Color? labelColor,
@@ -34,6 +37,7 @@ class TaskModel {
       id: id,
       title: title ?? this.title,
       time: time ?? this.time,
+      dueDate: dueDate ?? this.dueDate,
       description: description ?? this.description,
       label: label ?? this.label,
       labelColor: labelColor ?? this.labelColor,
