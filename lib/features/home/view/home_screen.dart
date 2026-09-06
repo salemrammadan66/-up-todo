@@ -25,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isCompletedExpanded = true;
   String _selectedFilter = 'Today';
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +65,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  final tasks = state.tasks;
-                  final completedTasks = state.completedTasks;
+                  final query = _searchQuery.trim().toLowerCase();
 
-                  if (tasks.isEmpty && completedTasks.isEmpty) {
+                  final tasks = query.isEmpty
+                      ? state.tasks
+                      : state.tasks
+                            .where(
+                              (task) =>
+                                  task.title.toLowerCase().contains(query),
+                            )
+                            .toList();
+
+                  final completedTasks = query.isEmpty
+                      ? state.completedTasks
+                      : state.completedTasks
+                            .where(
+                              (task) =>
+                                  task.title.toLowerCase().contains(query),
+                            )
+                            .toList();
+
+                  if (state.tasks.isEmpty && state.completedTasks.isEmpty) {
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -96,7 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   return ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [
-                      const TaskSearchBar(),
+                      TaskSearchBar(
+                        onChanged: (value) =>
+                            setState(() => _searchQuery = value),
+                      ),
                       const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -118,6 +139,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           onToggleComplete: () =>
                               context.read<TaskCubit>().toggleComplete(task.id),
+                        ),
+                      if (query.isNotEmpty && tasks.isEmpty && completedTasks.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 32),
+                          child: Center(
+                            child: Text(
+                              'No tasks match your search',
+                              style: AppTextStyles.bodySecondary,
+                            ),
+                          ),
                         ),
                       if (completedTasks.isNotEmpty) ...[
                         const SizedBox(height: 8),

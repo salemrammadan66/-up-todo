@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 
 class TaskSearchBar extends StatelessWidget {
-  const TaskSearchBar({super.key});
+  final ValueChanged<String> onChanged;
+
+  const TaskSearchBar({super.key, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +13,7 @@ class TaskSearchBar extends StatelessWidget {
       hint: 'Search for your task...',
       showLabel: false,
       prefixIcon: Icons.search,
+      onChanged: onChanged,
     );
   }
 }

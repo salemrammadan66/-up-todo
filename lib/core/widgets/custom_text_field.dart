@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool showLabel;
   final IconData? prefixIcon;
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -18,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.showLabel = true,
     this.prefixIcon,
+    this.onChanged,
   });
 
   @override
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
         ],
         TextField(
           controller: controller,
+          onChanged: onChanged,
           obscureText: isPassword,
           style: AppTextStyles.buttonText,
           decoration: InputDecoration(
