@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../../category/model/category_model.dart';
 import '../../../category/view/widgets/choose_category_sheet.dart';
+import '../../model/task_model.dart';
+import '../../viewmodel/task_cubit.dart';
 import 'date_time_picker_sheet.dart';
 import 'priority_picker_sheet.dart';
 
@@ -82,6 +85,29 @@ class _AddTaskSheetState extends State<AddTaskSheet> {
   }
 
   void _onSendTap() {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) return;
+
+    String timeText = 'No due date';
+    if (_selectedDate != null && _selectedTime != null) {
+      final hour = _selectedTime!.hour.toString().padLeft(2, '0');
+      final minute = _selectedTime!.minute.toString().padLeft(2, '0');
+      timeText =
+      '${_selectedDate!.day}/${_selectedDate!.month} At $hour:$minute';
+    }
+
+    final newTask = TaskModel(
+      id: DateTime.now().millisecondsSinceEpoch,
+      title: title,
+      time: timeText,
+      description: _descriptionController.text.trim(),
+      label: _selectedCategory?.name ?? 'General',
+      labelColor: _selectedCategory?.color ?? AppColors.primary,
+      priority: _selectedPriority ?? 1,
+    );
+
+    context.read<TaskCubit>().addTask(newTask);
+    Navigator.pop(context);
   }
 
   @override

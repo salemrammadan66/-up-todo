@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:up_todo/features/category/viewmodel/category_cubit.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
 import '../../model/category_dummy_data.dart';
 import '../../model/category_model.dart';
+import '../../viewmodel/category_state.dart';
 import '../create_category_screen.dart';
 import 'category_grid_item.dart';
 
@@ -23,6 +26,7 @@ class _ChooseCategorySheetState extends State<ChooseCategorySheet> {
     );
 
     if (result != null) {
+      context.read<CategoryCubit>().addCategory(result);
       Navigator.pop(context, result);
     }
   }
@@ -36,27 +40,35 @@ class _ChooseCategorySheetState extends State<ChooseCategorySheet> {
         children: [
           Text('Choose Category', style: AppTextStyles.headlineBold),
           const SizedBox(height: 24),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              for (final category in CategoryDummyData.categories)
-                CategoryGridItem(
-                  icon: category.icon,
-                  color: category.color,
-                  label: category.name,
-                  onTap: () => setState(() => _selectedCategory = category),
-                ),
-              CategoryGridItem(
-                icon: Icons.add,
-                color: AppColors.createNewCategoryColor,
-                label: 'Create New',
-                onTap: _onCreateNewTap,
-              ),
-            ],
+          BlocBuilder<CategoryCubit, CategoryState>(
+            builder: (context, state) {
+              final categories = state is CategoryLoaded
+                  ? state.categories
+                  : <CategoryModel>[];
+
+              return GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  for (final category in categories)
+                    CategoryGridItem(
+                      icon: category.icon,
+                      color: category.color,
+                      label: category.name,
+                      onTap: () => setState(() => _selectedCategory = category),
+                    ),
+                  CategoryGridItem(
+                    icon: Icons.add,
+                    color: AppColors.createNewCategoryColor,
+                    label: 'Create New',
+                    onTap: _onCreateNewTap,
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 24),
         ],
