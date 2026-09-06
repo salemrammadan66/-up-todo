@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:up_todo/features/category/viewmodel/category_cubit.dart';
+import 'package:up_todo/features/focus/viewmodel/focus_cubit.dart';
 import 'package:up_todo/features/profile/viewmodel/profile_cubit.dart';
 import 'package:up_todo/features/task/viewmodel/task_cubit.dart';
 import 'core/constants/app_colors.dart';
@@ -22,6 +23,7 @@ class UpTodoApp extends StatelessWidget {
         BlocProvider(create: (context) => TaskCubit()..loadTasks()),
         BlocProvider(create: (context) => CategoryCubit()..loadCategories()),
         BlocProvider(create: (context) => ProfileCubit()..loadProfile()),
+        BlocProvider(create: (context) => FocusCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
