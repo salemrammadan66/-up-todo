@@ -93,6 +93,20 @@ class TaskCubit extends Cubit<TaskState> {
     emitLoaded();
   }
 
+  void changeTime(int id, String time) {
+    for (int i = 0; i < tasks.length; i++) {
+      if (tasks[i].id == id) {
+        tasks[i] = tasks[i].copyWith(time: time);
+      }
+    }
+    for (int i = 0; i < completedTasks.length; i++) {
+      if (completedTasks[i].id == id) {
+        completedTasks[i] = completedTasks[i].copyWith(time: time);
+      }
+    }
+    emitLoaded();
+  }
+
   void emitLoaded() {
     emit(TaskLoaded(tasks: tasks, completedTasks: completedTasks));
   }

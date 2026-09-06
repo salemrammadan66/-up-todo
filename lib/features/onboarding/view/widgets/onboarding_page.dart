@@ -9,7 +9,6 @@ class OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int _currentIndex = 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(

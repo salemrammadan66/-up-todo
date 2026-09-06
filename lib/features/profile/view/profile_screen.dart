@@ -51,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _onChangeImageTap(BuildContext context) async {
-    final result = await showModalBottomSheet<String>(
+    await showModalBottomSheet<String>(
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(

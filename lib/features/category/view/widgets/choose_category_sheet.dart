@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:up_todo/features/category/viewmodel/category_cubit.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_text_styles.dart';
-import '../../model/category_dummy_data.dart';
 import '../../model/category_model.dart';
+import '../../viewmodel/category_cubit.dart';
 import '../../viewmodel/category_state.dart';
 import '../create_category_screen.dart';
 import 'category_grid_item.dart';
@@ -17,15 +16,13 @@ class ChooseCategorySheet extends StatefulWidget {
 }
 
 class _ChooseCategorySheetState extends State<ChooseCategorySheet> {
-  CategoryModel? _selectedCategory;
-
   void _onCreateNewTap() async {
     final result = await Navigator.push<CategoryModel>(
       context,
       MaterialPageRoute(builder: (_) => const CreateCategoryScreen()),
     );
 
-    if (result != null) {
+    if (result != null && mounted) {
       context.read<CategoryCubit>().addCategory(result);
       Navigator.pop(context, result);
     }
@@ -58,7 +55,7 @@ class _ChooseCategorySheetState extends State<ChooseCategorySheet> {
                       icon: category.icon,
                       color: category.color,
                       label: category.name,
-                      onTap: () => setState(() => _selectedCategory = category),
+                      onTap: () => Navigator.pop(context, category),
                     ),
                   CategoryGridItem(
                     icon: Icons.add,

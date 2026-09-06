@@ -44,7 +44,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
-  void _onTimeTap() async {
+  void _onTimeTap(TaskModel task) async {
     final date = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -57,6 +57,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
+    if (time == null || !mounted) return;
+
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    final timeText = '${date.day}/${date.month} At $hour:$minute';
+
+    context.read<TaskCubit>().changeTime(task.id, timeText);
   }
 
   void _onCategoryTap(TaskModel task) async {
@@ -181,7 +188,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         style: AppTextStyles.mutedLabel,
                       ),
                     ),
-                    onTap: _onTimeTap,
+                    onTap: () => _onTimeTap(task),
                   ),
                   const Divider(color: AppColors.border),
                   TaskDetailRow(
